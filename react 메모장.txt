@@ -1,0 +1,12 @@
+useState()
+hooks 중 useState는 배열을 반환함
+이 배열은 두개의 값을 가지는 배열을 반환함
+[data, setter]
+이것을 할당할 때
+인덱스 0 에는 변수명으로
+인덱스 1 에는 이 변수의 setter 를 할당해줌
+그리고 () 안에는 이 데이터의 초기값을 씀
+즉
+const [message, setMessage] = useState('');
+로 쓰면 message 라는 변수의 초기값은 ''이고
+setMessage 로 message 를 set할 수 있음
