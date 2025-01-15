@@ -10,3 +10,35 @@ hooks 중 useState는 배열을 반환함
 const [message, setMessage] = useState('');
 로 쓰면 message 라는 변수의 초기값은 ''이고
 setMessage 로 message 를 set할 수 있음
+
+
+const method = () => function
+parameter 가 없으면 바로 method 를 써도 되지만
+parameter 가 있는 경우 method 를 함수형태로 써야한다.
+() => method()
+
+state setter 이벤트 핸들러를 재사용 하기 위해
+태그의 name 을 state 와 같게 지정하면 저장된다.
+this.setState({
+      username: '',
+      message: ''
+    });
+이 상태에서 
+name 이 username 인 태그와 message 인 태그에
+동일한
+handleChange = e => {
+this.setState({
+[e. target.name]: e.target.value
+});
+}
+를 걸어주면 각각의 state 에 입력한 값이 들어간다.
+
+
+크게 4가지 경우에 rerendering 하는데
+그 중 하나인 state 의 변화는 조심해서 다뤄야 한다.
+state 의 변화를 남발하면 state 변화 , rerendering , state 변화, rerendering...
+연쇄작용으로 infinite loop 의 위험이 발생한다.
+
+
+onKeyPress (e.target == enter) => onClick 이런식의 연쇄로
+enter 키가 특정 버튼을 클릭 한 것과 같은 효과를 낼 수도 있다.
