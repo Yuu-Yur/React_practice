@@ -1,3 +1,4 @@
+3. 컴포넌트
 useState()
 hooks 중 useState는 배열을 반환함
 이 배열은 두개의 값을 가지는 배열을 반환함
@@ -11,7 +12,7 @@ const [message, setMessage] = useState('');
 로 쓰면 message 라는 변수의 초기값은 ''이고
 setMessage 로 message 를 set할 수 있음
 
-
+4. 이벤트 핸들러
 const method = () => function
 parameter 가 없으면 바로 method 를 써도 되지만
 parameter 가 있는 경우 method 를 함수형태로 써야한다.
@@ -43,7 +44,7 @@ state 의 변화를 남발하면 state 변화 , rerendering , state 변화, rere
 onKeyPress (e.target == enter) => onClick 이런식의 연쇄로
 enter 키가 특정 버튼을 클릭 한 것과 같은 효과를 낼 수도 있다.
 
-
+5. ref
 react 에선 id 는 잘 사용하지 않고 ref 를 사용한다.
 다만 id 를 사용해야 할 땐 id 뒤에 추가 텍스트를 붙여 중복을 방지함
 ref 는 크게 두가지 방법으로 사용함.
@@ -66,3 +67,12 @@ input = React.createRef();
 추가로 부모의 이벤트 핸들러에서 자식의 이벤트 핸들러를 부르면
 자식의 이벤트 -> 자식의 이벤트 리스너 -> 부모의 이벤트 리스너 -> 부모의 이벤트 핸들러 -> 자식의 이벤트 핸들러
 이 과정에서 부모가 자식의 요소를 쓸 수 있다
+
+// 주의점 스크롤 의 ScrollTop 은 화면 픽셀에 영향을 받는다.
+
+
+6.컴포넌트 반복
+map(함수) 기본 함수형태나 익명함수 형태나 많이 써왔던 그것
+기존 객체는 그대로 두고 기존 객체를 가지고 새로운 객체를 만드는 것
+concat(요소(객체)) 이것도 기존 객체를 변경하는 것이 아니라 요소를 추가한 새 객체를 만듬
+filter 이것도 사용하던 것 조건에 맞는 객체만 남김, 조건을 !== 로 걸면 특정을 제외한 것만 남김 즉 특정한 것을 삭제
