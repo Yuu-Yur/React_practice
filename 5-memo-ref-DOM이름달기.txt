@@ -1,0 +1,640 @@
+
+
+5장ref: DOM에 이름 달기
+5.1 ref는 어떤 상황에서 사용해야 할까?
+5.2 ref 사용
+5.3 컴포넌트에 ref 달기
+5.4 정리
+
+일반 HTML에서 DOM 요소에 이름을 달 때는 id를 사용합니다.
+
+DOM 요소의 id
+
+〈div id="my-element"></div>
+
+특정 DOM 요소에 어떤 작업을 해야 할 때 
+이렇게 요소에 id를 달면 CSS에서 
+특정 id에 특정 스타일을 적용하거나 
+
+자바스크립트에서 해당 id를 가진 요소를 찾아서 
+작업할 수 있겠죠. 
+
+리액트 프로젝트에 사용하는 public/index.html 파일에도 
+id가 root인 div 요소가 있습니다.
+
+public/index.html
+<html lang="en">
+<head>
+‹meta charset="utf-8">
+‹meta name="viewport" content="width=device-width
+, initial-scale=1">
+clink rel="shortcut icon" href="%PUBLIC_URL%/favi
+
+그리고 src/index.js 파일 중에는 
+id가 root인 요소에 리액트 컴포넌트를 렌더링하라는 코드가 있습니다.
+src/index.js
+
+(...)
+ReactDOM. render <App />, document. getElementById('root'））；
+
+이렇게 HTML에서 id를 사용하여 DOM에 이름을 
+다는 것 처럼 
+리액트 프로젝트 내부에서 DOM에 이름을 다는 방법이 있습니다. 
+
+바로 ref (reference의 줄임말) 개념입니다.
+
+노트 
+리액트 컴포넌트 안에서는 id를 사용하면 안 되나요?
+
+리액트 컴포넌트 안에서도 id를 사용할 수 있습니다. 
+JSX 안에서 DOM에 id를 달면 해당 DOM을 렌더링할 때 그대로 전달됩니다. 
+
+하지만 특수한 경우가 아니면 사용을 권장하지 않습니다. 
+
+예를 들어 
+같은 컴포넌트를 여러 번 사용한다고 가정해 보세요. 
+HTML에서 DOM의 id는 유일 (unique)해야 하는데, 
+이런 상황에서는 중복 id를 가진 
+DOM이 여러 개 생기니 잘못된 사용입니다.
+
+ref는 전역적으로 작동하지 않고 
+컴포넌트 내부에서만 작동하기 때문에 
+이런 문제가 생기지 않습니다.
+
+대부분은 id를 사용하지 않고도 원하는 기능을 구현할 수 있지만, 
+다른 라이브러리나 프레임워크와 함께 
+id를 사용해야 하는 상황이 발생할 수 있습니다. 
+
+이런 상황에서는 컴포넌트를 만들 때마다 
+id 뒷부분에 추가 텍스트를 붙여서
+(예: button01 button02 button03…·) 
+중복 id가 발 생하는 것을 방지해야 합니다.
+
+
+
+var input = document.getElementById('password')
+;
+input. className = '';
+if(input.value === '0000') {
+input.className = 'success';
+} else {
+input.className = 'failure';
+｝
+｝
+≤/script>
+</head>
+<body>
+</body>
+〈/html>
+‹input type="password" id="password"></input>
+<button onclick="validate()">Validate</button>
+Validate
+
+암호 0000 입력 후 Validate 버튼 클릭 결과
+하지만 리액트에서 이런 작업은 굳이 DOM에 접근하지 
+않아 도 state로 구현할 수 있습니다. 
+
+잘 이해되지 않나요? 
+앞으로 작성할 예제 코드를 확인해 보면 감이 올 것입니다. 
+
+리액트 컴포넌트에서 state를 사용하여 
+제시한 기능을 한번 구현 해 보겠습니다.
+
+이 장에서는 클래스형 컴포넌트에서 ref를 사용하는 방법을 알아보겠습니다. 
+함수 컴포넌트에서 ref를 사용하려면 
+Hooks를 사용해야 하기 때문에 
+8장에서 Hooks를 배우면서 알 아볼 것입니다.
+
+
+5.1.1 예제 컴포넌트 생성
+
+src 디렉터리 안에 ValidationSample.css와 
+Validationsample.js 파일을 만들어 주세요.
+
+ValidationSample.css
+
+.success {
+  background-color: lightgreen;
+}
+
+.failure {
+  background-color: lightcoral;
+}
+
+
+
+ValidationSample.js
+
+import React, { Component } from 'react';
+import './ValidationSample.css';
+
+class ValidationSample extends Component {
+  state = {
+    password: '',
+    clicked: false,
+    validated: false
+  };
+
+  handleChange = (e) => {
+    this.setState({
+      password: e.target.value
+    });
+  };
+
+  handleButtonClick = () => {
+    this.setState({
+      clicked: true,
+      validated: this.state.password === '0000'
+    });
+  };
+
+  render() {
+    return (
+      <div>
+        <input
+          type="password"
+          value={this.state.password}
+          onChange={this.handleChange}
+          className={
+            this.state.clicked
+              ? this.state.validated
+                ? 'success'
+                : 'failure'
+              : ''
+          }
+        />
+        <button onClick={this.handleButtonClick}>확인</button>
+      </div>
+    );
+  }
+}
+
+export default ValidationSample;
+
+여기서부터 작업
+input에서는 onChange 이벤트가 발생하면 
+handleChange를 호출하여 state의 password 값을 
+업데이트하게 했습니다. 
+
+button에서는 onClick 이벤트가 발생하면 
+handLeButtoncLick을 호출하여 Clicked 값을 참으로 설정했고, 
+validated 값을 검증 결과로 설정했습니다.
+
+input의 className 값은 버튼을 누르기 전에는 
+비어 있는 문자열을 전달하며, 
+버튼을 누른 후에는 검증 결과에 따라 
+Success 값 또는 failure 값을 설정합니다. 
+
+그리고 이 값에 따라 input 색상이 초록색 또는 빨간색으로 나타납니다.
+
+5.1.2 App 컴포넌트에서 예제 컴포넌트 렌더링
+
+App 컴포넌트에서 ValidationSample 컴포넌트를 
+불러와 렌더링해 보겠습니다. 
+그 과정에서, App 컴포넌트를 함수 컴포넌트에서 
+클래스형 컴포넌트로 전환해 주세요. 
+
+우리가 추후 App 컴포넌트에서 ref를 
+사용할 것이기 때문에 이렇게 
+미리 클래스형 컴포넌트로 작성해 주겠습니다.
+
+import React, { Component } from 'react';
+import ValidationSample from './ValidationSample';
+
+class App extends Component {
+  render() {
+    return (
+      <ValidationSample />
+    );
+  }
+}
+
+export default App;
+
+
+코드를 저장하고, 다음 결과물이 나타나는지 확인하세요.
+
+
+5.1.3 DOM을 꼭 사용해야 하는 상황 
+
+앞 예제에서는 State를 사용하여 
+우리에게 필요한 기능을 구 현했지만, 
+가끔 State만으로 해결할 수 없는 기능이 있습니다. 
+어떤 상황인지 알아볼까요?
+
+1 특정 input에 포커스 주기
+2 스크롤 박스 조작하기
+3 Canvas 요소에 그림 그리기 등
+
+이때는 어쩔 수 없이 DOM에 직접적으로 접근해야 하는데, 
+이를 위해 바로 ref를 사용합니다.
+
+
+5.2 ref 사용
+이제 프로젝트에서 ref를 사용해봅시다. 
+ref를 사용하는 방법은 두 가지입니다.
+
+5.2.1 콜백 함수를 통한 ref 설정
+ref를 만드는 가장 기본적인 방법은 
+콜백 함수를 사용하는 것입니다. 
+
+ref를 달고자 하는 요소에 ref라는 콜백 함수를 
+props로 전달해 주면 됩니다. 
+
+이 콜백 함수는 ref 값을 파라미터로 전달받습니다. 
+
+그리고 함수 내부에서 파라미터로 받은 ref를 
+컴포넌트의 멤버 변수로 설정해 줍니다.
+
+콜백 함수 사용 예시
+<input ref={(ref) => { this.input = ref }} />
+
+이렇게 하면 앞으로 this.input은 
+input 요소의 DOM을 가리킵니다. 
+
+ref의 이름은 원하는 것으로 자유롭게 지정할 수 있습니다. 
+DOM 타입과 관계없이 this.superman = ref 처럼 마음대로 지정합니다.
+
+5.2.2 createRef를 통한 ref 설정
+ref를 만드는 또 다른 방법은 리액트에 내장되어있는 
+createRef라는 함수를 사용하는 것입니다. 
+
+이 함수를 사용해서 만들면 더 적은 코드로 쉽게 사용할 수 있습니다. 
+이 기능은 리액트 v16.3부터 도입되었으며 
+이전 버전에서는 작동하지 않 습니다.
+
+예시 코드를 한번 살펴봅시다.
+createRef 사용 예시
+
+import React, { Component } from 'react';
+
+class RefSample extends Component {
+  input = React.createRef();
+
+  handleFocus = () => {
+    this.input.current.focus();
+  };
+
+  render() {
+    return (
+      <div>
+        <input ref={this.input} />
+        <button onClick={this.handleFocus}>Focus Input</button>
+      </div>
+    );
+  }
+}
+
+export default RefSample;
+
+
+createRef를 사용하여 ref를 만들려면 
+우선 컴포넌트 내부에서 멤버 변수로 React.createRef()를 
+담아 주어야 합니다. 
+
+그리고 해당 멤버 변수를 ref를 달고자 하는 요소에 
+ref props로 넣어주면 ref 설정이 완료됩니다.
+
+설정한 뒤 나중에 ref를 설정해준 DOM에 접근하려면 
+this.input.current를 조회하면 됩니다. 
+
+콜백 함수를 사용할때와 다른 점은 이렇게 뒷부분에 
+current를 넣어 주어야 한 다는 것입니다.
+
+지금까지 콜백 함수 혹은 CreateRef를 사용하여 
+ref를 만드는 방법을 배워 보았습니다. 
+
+앞으로 두 가지 방법 중에서 편한 방법을 사용하세요.
+이번 장에서는 주로 콜백 함수를 사용하는 방식으로 ref를 다루어 보겠습니다.
+
+5.2.3 적용
+5.1절에서 만든 ValidationSample 컴포넌트의 렌더링 
+결과를 다시 한 번 살펴봅시다
+
+input 요소를 클릭하면 포커스가 되면서 텍스트 커서가 깜박입니다.
+
+
+버튼을 누르면 포커스가 버튼으로 넘어가면서 
+왼쪽 input 요소의 텍스트 커서가 더 이상 보이지 않습니다.
+
+버튼을 한 번 눌렀을 때, 
+포커스가 다시 input 쪽으로 자동으로 넘어가도록 코드를 작성해 봅시다.
+
+5.2.3.1 input에 ref 달기
+
+5.2. 1절에서 배운 대로 콜백 함수를 사용하여 
+ValidationSample 컴포넌트에도 ref를 달아 보세요.
+
+ValidationSample.js의 input 요소
+(...)
+<input
+(...)
+ret=1(ret) => this.input=ret}
+1>
+
+5.2.3.2 버튼 onClick 이벤트 코드 수정 버튼에서 
+onCLick 이벤트가 발생할 때 
+input에 포커스를 주도록 코드를 수정해 보세요. 
+
+이제 this.input이 컴포넌트  부의 input 요소를 가리키고 있으니, 
+일반 DOM을 다루듯이 코드를 작성하면 됩니다.
+
+ValidationSample.js - handle ButtonClick 메서드
+
+handleButtonClick = () => {
+this.setState({
+clicked: true,
+validated: this.state.password === '0000'
+});
+
+
+this.input. focus (;
+｝
+
+import React, { Component } from 'react';
+import './ValidationSample.css';
+
+class ValidationSample extends Component {
+  state = {
+    password: '',
+    clicked: false,
+    validated: false
+  };
+
+  handleChange = (e) => {
+    this.setState({
+      password: e.target.value
+    });
+  };
+
+  handleButtonClick = () => {
+    this.setState({
+      clicked: true,
+      validated: this.state.password === '0000'
+    });
+  };
+
+  render() {
+    return (
+      <div>
+        <input
+          type="password"
+          ref={(ref) => (this.input = ref)}
+          value={this.state.password}
+          onChange={this.handleChange}
+          className={
+            this.state.clicked
+              ? this.state.validated
+                ? 'success'
+                : 'failure'
+              : ''
+          }
+        />
+        <button onClick={this.handleButtonClick}>확인</button>
+      </div>
+    );
+  }
+}
+
+export default ValidationSample;
+
+코드를 저장하고, 웹 브라우저에서 페이지를 열어 버튼을 눌러 보세요. 
+포커스가 input으로 바로 넘어가나요?
+
+
+
+5.3 컴포넌트에 ref 달기
+리액트에서는 컴포넌트에도 ref를 달 수 있습니다. 
+
+이 방법은 주로 컴포넌트 내부에 있는 
+DOM을 컴포넌트 외부에서 사용할 때 씁니다. 
+
+컴포넌트에 ref를 다는 방법은 DOM에 ref를 다는 방법과 똑같습니다.
+
+5.3.1 사용법
+‹MyComponentref={(ref) =>{this.myComponent=ref}}/>
+
+이렇게 하면 MyComponent 내부의 메서드 및 
+멤버 변수에도 접근할 수 있습니다. 
+
+즉, 내부의 ref에도 접근할 수 있습니다
+(예: myComponent.handleclick, myComponent. input등).
+
+이번에는 스크롤 박스가 있는 컴포넌트를 하나 만들고, 
+스크롤 바를 아래로 내리는 작업을 부모 컴포넌트에서 실행해 보겠습니다.
+
+이번 실습은 다음 흐름으로 진행합니다.
+
+ScrollBox 컴포넌트 만들기
+컴포넌트에 ret 달기
+ref를 이용하여 컴포넌트 내부 메서드 호출하기
+
+
+5.3.2 컴포넌트 초기 설정 먼저 
+
+ScrollBox라는 컴포넌트 파일을 만들겠습니다. 
+JSX의 인라인 스타일링 문법으로 
+스크롤 박스를 만들어 보세요. 
+
+그 다음에는 최상위 DOM에 ref를 달아 주세요
+
+5.3.2. 1 컴포넌트 파일 생성
+ScrollBox.js
+
+class ScrollBox extends Component {
+  render() {
+    const style = {
+      border: '1px solid black',
+      height: '300px',
+      width: '300px',
+      overflow: 'auto',
+      position: 'relative'
+    };
+
+    const innerStyle = {
+      width: '100%',
+      height: '650px',
+      background: 'linear-gradient(white, black)'
+    };
+
+    return (
+      <div
+        style={style}
+        ref={(ref) => {
+          this.box = ref;
+        }}
+      >
+        <div style={innerStyle} />
+      </div>
+    );
+  }
+}
+
+export default ScrollBox;
+
+
+
+5.3.2.2 App 컴포넌트에서 스크롤 박스 컴포넌트 렌더링
+
+기존 ValidationSample을 지우고, 
+방금 만든 ScrollBox 컴포넌트를 렌더링해 주세요.
+
+App.js
+import React, { Component } from 'react';
+import ScrollBox from './ScrollBox';
+
+class App extends Component {
+  render() {
+    return (
+      <div>
+        <ScrollBox />
+      </div>
+    );
+  }
+}
+
+export default App;
+
+
+코드를 저장하고, 웹 브라우저에서 스크롤 박스가 
+잘 렌더링 되어 있는지 확인하세요.
+
+
+5.3.3 컴포넌트에 메서드 생성 
+
+컴포넌트에 스크롤바를 맨 아래쪽으로 내리는 메서드를 만들 겠습니다. 
+자바스크립트로 스크롤바를 내릴 때는 
+DOM 노드 가 가진 다음 값들을 사용합니다.
+  scrolLTop: 세로 스크롤바 위치(0~350)
+  scrolLHeight: 스크롤이 있는 박스 안의 div 높이(650)
+  clientHeight: 스크롤이 있는 박스의 높이(300)
+  
+스크롤바를 맨 아래쪽으로 내리려면 
+scrollHeight에서 ClientHeight를 빼면 되겠지요?
+
+
+ScrollBox.js
+
+import React, { Component } from 'react';
+
+class ScrollBox extends Component {
+  scrollToBottom = () => {
+    const { scrollHeight, clientHeight } = this.box;
+    /* 위 코드는 비구조화 할당 문법을 사용한 것입니다.
+       아래 코드는 같은 의미입니다:
+       const scrollHeight = this.box.scrollHeight;
+       const clientHeight = this.box.clientHeight;
+    */
+    this.box.scrollTop = scrollHeight - clientHeight;
+  };
+
+  render() {
+    return (
+      <div
+        style={{
+          border: '1px solid black',
+          height: '300px',
+          width: '300px',
+          overflow: 'auto',
+          position: 'relative',
+        }}
+        ref={(ref) => {
+          this.box = ref;
+        }}
+      >
+        <div style={{ height: '650px' }}>
+          {/* 이 내부는 스크롤 테스트용 콘텐츠입니다. */}
+          Scrollable Content
+        </div>
+      </div>
+    );
+  }
+}
+
+export default ScrollBox;
+
+
+
+scrolLToBottom 메서드의 첫 번째 줄에서는 
+ES6의 비구조 화 할당 문법을 사용했습니다.
+
+이렇게 만든 메서드는 부모 컴포넌트인 App 컴포넌트에서 
+SCroLLBOx에 ref를 달면 사용할 수 있습니다.
+
+5.3.4 컴포넌트에 ref 달고 내부 메서드 사용 
+
+그럼 App 컴포넌트에서 ScrolLBOX에 ref를 달고 
+버튼을 만들어 누르면, 
+ScroLLBox 컴포넌트의 ScroLLToBottom 메서드를 
+실행하도록 코드를 작성하겠습니다.
+
+App.js
+
+import React, { Component } from 'react';
+import ScrollBox from './ScrollBox';
+
+class App extends Component {
+  render() {
+    return (
+      <div>
+        <ScrollBox ref={(ref) => (this.scrollBox = ref)} />
+        <button onClick={() => this.scrollBox.scrollToBottom()}>
+          맨 밑으로
+        </button>
+      </div>
+    );
+  }
+}
+
+export default App;
+
+
+
+여기서 주의할 점이 하나 있습니다. 
+문법상으로는 onCLick = {this.scrollBox.scrollToBottom} 
+같은 형식으로 작성 해도 틀린 것은 아닙니다. 
+
+하지만 컴포넌트가 처음 렌더링될 때는 thiS.scrollBox 값이 
+undefined이므로 this.scrollBox.scrollToBottom 값을 
+읽어 오는 과정에서 오류가 발생 합니다. 
+
+화살표 함수 문법을 사용하여 아예 새로운 함수를 만들고 
+그 내부에서 this.scrollBox.scrollToBottom 메서드를 실행하면, 
+버튼을 누를 때 (이미 한 번 렌더링을 해서 this.scrollBox 설정한 시점) 
+this.scrollBox.scrollToBottom 값을 읽어 와서 
+실행하므로 오류가 발생하지 않습니다.
+
+자, 이제 코드를 저장하고 웹 브라우저에서 맨 밑으로 버튼을 눌러 보세요.
+
+
+스크롤바가 잘 움직이나요?
+
+5.4 정리
+컴포넌트 내부에서 DOM에 직접 접근해야 할 때는 ref를 사용합니다. 
+먼저 ref를 사용하지 않고도 원하는 기능을 구현 할 수 있는지 
+반드시 고려한 후에 활용하세요.
+
+이 시점에서 오해할 수 있는 부분이 있는데, 
+서로 다른 컴포넌트끼리 데이터를 교류할 때 ref를 사용한다면 이
+는 잘못 사용된 것입니다. 
+
+물론 할 수는 있습니다. 컴포넌트에 ref를 달고 
+그 ref를 다른 컴포넌트로 전달하고 
+•••••• 다른 컴포넌트에서 
+ref로 전달받은 컴포넌트의 메서드를 실행하고••••••.
+
+하지만 이 방법은 리액트 사상에 어긋난 설계입니다. 
+앱 규모 가 커지면 마치 스파게티처럼 구조가 꼬여 버려서 
+유지 보수 가 불가능하지요.
+
+컴포넌트끼리 데이터를 교류할 때는 언제나 데이터를 
+부모 ~ 자식 흐름으로 교류해야 합니다. 
+
+나중에 리덕스 혹은 Context API를 사용하여 
+효율적으로 교류하는 방법을 배울 것입니다.
+
+아직 함수 컴포넌트에서 ref를 사용하는 것은 
+배우지 않았는 데요. 
+함수 컴포넌트에서는 useRef라는 Hook 함수를 사용 합니다. 
+사용법은 이 장에서 배운 React.CreateRef와 유사 합니다. 
+이에 관련된 내용은 8장에서 자세히 알아보겠습니다

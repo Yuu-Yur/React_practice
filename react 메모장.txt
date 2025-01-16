@@ -42,3 +42,27 @@ state 의 변화를 남발하면 state 변화 , rerendering , state 변화, rere
 
 onKeyPress (e.target == enter) => onClick 이런식의 연쇄로
 enter 키가 특정 버튼을 클릭 한 것과 같은 효과를 낼 수도 있다.
+
+
+react 에선 id 는 잘 사용하지 않고 ref 를 사용한다.
+다만 id 를 사용해야 할 땐 id 뒤에 추가 텍스트를 붙여 중복을 방지함
+ref 는 크게 두가지 방법으로 사용함.
+
+1.지정하고 싶은 요소에 ref 라는 콜백함수를 props 로 전달
+<input ref={(ref) => {this.input = ref}} />
+이렇게 찍으면 this.input 은 위의 input 을 가르킨다.
+즉 id를 지정하는 것과 비슷하게 ref 를 지정하는데 화살표 함수의 parameter 를 ref 로 사용하는것이다.
+
+2. createRef 를 통해 설정
+input = React.createRef();
+<input ref={this.input} />
+다만 사용할 때 this.input 이 아니라 this.input.current 를 사용해야 한다.
+
+
+부모-자식간에 이벤트 리스너-핸들러 바인딩
+부모가 자식컴포넌트를 쓸 때 이벤트 리스너를 props 로 쓰고 부모의 이벤트핸들러를 쓰고
+자식이 이벤트 리스너를 쓸 때 이벤트 핸들러로 props.부모의 이벤트 리스너를 쓰면
+자식의 이벤트가 일어났을 때 부모의 이벤트 핸들러를 작동할 수 있다.
+추가로 부모의 이벤트 핸들러에서 자식의 이벤트 핸들러를 부르면
+자식의 이벤트 -> 자식의 이벤트 리스너 -> 부모의 이벤트 리스너 -> 부모의 이벤트 핸들러 -> 자식의 이벤트 핸들러
+이 과정에서 부모가 자식의 요소를 쓸 수 있다
