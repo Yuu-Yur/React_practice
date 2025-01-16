@@ -1,6 +1,25 @@
-import React, { createRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 const IterationPractice = () => {
+  //useEffect 컴포넌트 불러올 때 리스너 추가되고 언마운트할때 리스너 없어짐
+  useEffect(() => {
+    const handleClick = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setShowMenu(false);
+      }
+    };
+
+    // window에 이벤트 리스너 추가
+    window.addEventListener('click', handleClick);
+
+    // 컴포넌트가 언마운트될 때 이벤트 리스너 정리
+    return () => {
+      window.removeEventListener('click', handleClick);
+    };
+  }, []);
+
+  const menuRef = useRef(null);
+
   const [names, setNames] = useState([
     { id: 1, text: '눈사람' },
     { id: 2, text: '얼음' },
@@ -147,6 +166,7 @@ const IterationPractice = () => {
       {showMenu && (
         <>
           <ul
+            ref={menuRef}
             style={{
               position: 'absolute',
               top: `${menuPosition.top}px`,
