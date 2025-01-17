@@ -85,6 +85,27 @@ name.id === selected.id ? { ...name, text: updateInput } : name,
 
 
 7. 컴포넌트 라이프사이클
+라이프사이클메서드는 클래스형컴포넌트에서만 사용 가능
 마운트, 업데이트, 언마운트
-업데이트에도 4가지 경우 업데이트(리렌더링) 가 있음
--state, props, context 의 변경, 그리고 forceUpdate
+업데이트에도 4가지 경우 업데이트가 있음
+-state, props 변경, 부모 컴포넌트의 리렌더링, 그리고 forceUpdate
+
+7.1마운트
+constructor(props) : 컴포넌트 생성자
+getDerivedStateFromProps(nextProps,prevState) nextState 를 반환 : props 로 받은 값을 state 에 동기화
+render() 화면 반환 : 화면 렌더링
+componentDidMount() : js라이브러리나 프레임워크의 함수 호출, 이벤트 등록 등등 후처리
+
+7.2업데이트
+getDerivedStateFromProps(nextProps,prevState) nextState 반환
+shouldComponentUpdate(nextProps,nextState) true,false 반환 : props 나 state 변경 시 리렌더링 여부 지정
+render() 화면 반환
+getSnapshotBeforeUpdate(prevProps,prevState) snapshot 반환 : render 결과가 브라우저에 반영되기 직전에 호출, 업데이트 직전 값을 참고할 일이 있을 때
+componentDidUpdate(prevProps,prevState,snapshot) 반환값 없음 : render 완료 후 실행, prevProps, prevState, snapshot 을 받아 사용할 수 있음
+
+7.3언마운트
+componentWillUnmount() : componentDidMount 에서 등록한 것들을 제거해야함
+
+7.4예외
+componentDidCatch(error,info) : 에러 발생 시 사용
+각각 무엇을 parameter 로 받는지 주의
