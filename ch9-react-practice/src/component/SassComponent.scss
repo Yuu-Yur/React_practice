@@ -1,0 +1,63 @@
+@import '../styles/utils.scss';
+.SassComponent {
+    display: flex;
+    background: $oc-gray-2;
+  
+    @include media('<768px') {
+      background: $oc-gray-9;
+    }
+
+  .box { 
+    background: red;
+    cursor: pointer;
+    transition: all 0.3s ease-in;
+
+    &.red { 
+      background: $red;
+      @include square(1,$red);
+    }
+
+    &.orange {
+      background: $orange;
+      @include square(2,$orange);
+    }
+
+    &.yellow {
+      background: $yellow;
+      @include square(3,$yellow);
+    }
+
+    &.green {
+      background: $green;
+      @include square(4,$green);
+    }
+
+    &.blue {
+      background: $blue;
+      @include square(5,$blue);
+    }
+
+    &.indigo {
+      background: $indigo;
+      @include square(6,$indigo);
+    }
+
+    &.violet {
+      background: $violet;
+      @include square(7,$violet);
+    }
+    // 문제 1: 새로운 색상과 크기 추가 .box .pink 클래스 만듬
+    &.pink {
+      background: $pink;
+      @include square(8,$pink);
+    }
+    // 문제 1: 새로운 색상과 크기 추가 background 흰색 설정
+    &:hover {
+        background: white;
+      }
+  }
+}
+// 문제 3: 박스 순서 기반 스타일링 SassComponent 아래의 .box 중 첫번째와 마지막에 $violset 을 배경색으로
+.SassComponent .box:first-of-type, .SassComponent .box:last-of-type {
+  background: $violet;
+}

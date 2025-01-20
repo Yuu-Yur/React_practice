@@ -1,0 +1,22 @@
+@import 'include-media/dist/_include-media';
+@import 'open-color/open-color';
+$red: #fa5252;
+$orange: #fd7e14;
+$yellow: #fcc419;
+$green: #40c057;
+$blue: #339af0;
+$indigo: #5c7cfa;
+$violet: #7950f2;
+// 문제 1: 새로운 색상과 크기 추가 $pink 변수 추가
+$pink: #f1d1d2;
+
+// 믹스인 만들기 (재사용되는 스타일 블록을 함수처럼 사용할 수 있음)
+@mixin square($size, $color) {
+  $calculated: 32px * $size;
+  width: $calculated;
+  height: $calculated;
+  // 문제 2: 믹스인 확장 색을 parameter 로 받아서 체크
+  @if($color == $green) {
+    border: 4px solid $blue;
+  }
+}

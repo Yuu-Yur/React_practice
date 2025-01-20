@@ -1,11 +1,15 @@
+import React, { Component } from 'react';
 import './App.css';
+import SassComponent from './component/SassComponent';
+import CSSModule from './component/CSSModule';
+import StyledComponent from './component/StyledComponent';
 
-function App() {
-  return (
-    <>
-      <h1>CH9. 컴포넌트 스타일링</h1>
-    </>
-  );
+class App extends Component {
+  render() {
+    // return <StyledComponent />;
+    return <SassComponent />;
+    // return <CSSModule />;
+  }
 }
 
 export default App;
