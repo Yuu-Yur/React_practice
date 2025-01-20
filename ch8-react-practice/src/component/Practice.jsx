@@ -13,7 +13,8 @@ const Practice = () => {
   const [number, setNumber] = useState('');
   //추가1
   const inputEl = useRef(null);
-  const [nextIndex, setNextIndex] = useState(1);
+  const [nextIndex, setNextIndex] = useState(0);
+  const [lastIndex, setLastIndex] = useState(0);
 
   const onChange = useCallback((e) => {
     setNumber(e.target.value);
@@ -32,9 +33,12 @@ const Practice = () => {
       index: nextIndex,
       number: parseInt(number, 10),
     });
+    console.log(nextIndex);
     setList(nextList);
     setNextIndex(nextIndex + 1);
     setNumber('');
+    setLastIndex(list.length);
+    console.log(list.length);
     //추가2
     inputEl.current.focus(); // 입력창 포커스
   }, [nextIndex, number, list]); // number 혹은 list가 바뀔 때만 함수 생성
@@ -46,6 +50,8 @@ const Practice = () => {
     [list],
   ); // list가 변경될 때만 평균값 계산
 
+  // 응용 실습 예제 1: 최근 입력값 하이라이트 index 가 가장 큰 것이 가장 최근 입력값이므로 index max 구하기
+  // 풀이 : 가장 최근에 추가된 인덱스는 배열.length - 1 state 하나 만들고 setter 에 list.length - 1 아래서 list.index === state 하면 됨
   const max = list.reduce(
     (max, current) => {
       return current.index > max.index ? current : max;
@@ -69,7 +75,8 @@ const Practice = () => {
         {list.map((list) =>
           // 응용 실습 예제 2: 평균값 기준 필터링 삼항연산자로 해결
           list.number > avg ? (
-            max.index === list.index ? (
+            // 응용 실습 예제 1: 최근 입력값 하이라이트 하이라이트 추가
+            lastIndex === list.index ? (
               <li
                 key={list.index}
                 style={{ backgroundColor: 'black', color: 'white' }}
