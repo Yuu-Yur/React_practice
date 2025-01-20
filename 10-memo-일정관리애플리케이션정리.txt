@@ -1,0 +1,1365 @@
+10장 일정 관리 웹 애플리 케이션 만들기
+10.1 프로젝트 준비하기
+10.2 UI 구성하기
+10.3 기능 구현하기
+10.4 정리
+
+지금까지 리액트의 기본기부터 시작해서 
+컴포넌트를 스타일링하는 방법까지 배워 보았습니다. 
+이 장에서는 지금까지 배운 지식을 활용하여 
+프런트엔드를 공부할 때 많이 구현하는 
+일정 관리 애플리케이션을 만들어 보겠습니다.
+
+ 일정 관리 애플리케이션
+ 
+이번 실습은 다음 흐름으로 진행됩니다.
+프로젝트 준비하기
+U 구성하기
+기능 구현하기
+
+일정 관리 애플리케이션 개발 흐름
+
+
+
+10.1 프로젝트 준비하기
+
+10.1.1 프로젝트 생성 및 필요한 라이브러리 설치
+
+create-react-app을 사용하여 프로젝트를 생성하세요.
+
+$ yarn create react-app todo-app
+
+프로젝트가 생성되면 todo-app 디렉터리로 들어가서 
+yarn 을 사용하여 필요한 라이브러리를 설치하세요.
+
+$ cd todo-app
+$ yarn add sass classnames react-icons
+
+이 프로젝트에서 Sass를 사용할 예정이므로 
+sass를 설치해 주었습니다. 
+
+classnames는 나중에 조건부 스타일링을 
+좀 더 편하게 하기 위해 설치했습니다. 
+
+react-icons는 리액트에서 다양하고 예쁜 아이콘을 
+사용할 수 있는 라이브러리입니다.
+
+아이콘 리스트와 사용법은 
+https://react-icons.github.io/react-icons/
+에서 확인 할 수 있습니다. 
+
+이 라이브러리의 장점은 SVG형태로 이루어진 아이콘을 
+리액트 컴포넌트처럼 매우 쉽게 사용할 수 있다는 것입니다. 
+
+아이콘의 크기나 색상은 props 혹은 CSS 스타일로 
+변경하여 사용할 수 있습니다.
+
+10.1.2 Prettier 설정
+
+2장에서 배웠던 Prettier를 설정하여 코드를 작성할 때 
+코드 스타일을 깔끔하게 정리하겠습니다. 프로젝트의 최상위 
+디렉터리에 prettierrc 파일을 다음과 같이 생성하세요.
+
+.prettierre
+{
+"singleQuote": true,
+"semi": true,
+"useTabs": false,
+"tabWidth": 2,
+"trailingComma": "all",
+"printWidth": 80
+}
+
+
+10.1.3 index.css 수정
+
+프로젝트의 글로벌 스타일 파일이 들어 있는 
+index.css를 조금 수정하겠습니다. 
+
+기존에 있던 폰트 설정은 지우고 background 속성을 설정해 주세요.
+
+index.css
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #ececef;
+}
+
+배경색을 회색으로 설정했습니다.
+
+
+10.1.4 App 컴포넌트 초기화 
+
+이제 기존에 있던 App 컴포넌트의 내용을 모두 삭제합니다.
+
+App.js
+
+const App = () => {
+return <div>Todo App을 만들자!</div>;
+}
+export default App;
+
+이제 기본적인 준비는 모두 끝났습니다! 
+프로젝트 디렉터리 에서 yarn start 명령어를 입력하여 
+개발 서버를 구동하세요.
+
+
+이 화면처럼 회색 배경이 나타났나요? 
+그럼 이제 본격적으로 UI개발을 시작해 봅시다!
+
+10.2 UI 구성하기
+
+앞으로 만들 컴포넌트를 하나하나 용도별로 소개하겠습니다!
+
+   TodoTemplate: 화면을 가운데에 정렬시켜 주며, 
+   앱 타이 틀(일정 관리)을 보여 줍니다. 
+   children으로 내부 JSX를 props로 받아 와서 렌더링해 줍니다.
+   
+   TodoInsert: 새로운 항목을 입력하고 추가할 수 있는 컴포넌트입니다. 
+   state를 통해 인풋의 상태를 관리합니다.
+   
+   TodoListItem: 각 할 일 항목에 대한 정보를 보여주는 컴포넌트입니다. 
+   todo 객체를 props로 받아와서 상태에 따라 다른 스타일의 
+   UI를 보여줍니다.
+   
+   TodoList: todos 배열을 props로 받아 온 후, 
+   이를 배열 내장 함수 map을 사용해서 
+   여러 개의 TodoListItem 컴포넌트로 변환하여 보여 줍니다.
+   
+이렇게 총 네 개의 컴포넌트를 만듭니다. 
+이 컴포넌트들은 src 디렉터리에 components라는 
+디렉터리를 생성하여 
+그 안에 저장하겠습니다. 
+
+컴포넌트 파일을 components 디렉터리에 넣는 이유는 
+기능이나 구조상 필요하기 때문이 
+
+아니라 자주 사용되는 관습이기 때문입니다.
+
+지금 단계에서는 컴포넌트의 기능에 대해 신경 쓰기보다는 
+모양새를 갖추는 데 집중하겠습니다.
+
+
+10.2.1 TodoTemplate 만들기
+
+src 디렉터리에 components 디렉터리를 생성한 뒤 그 안에
+
+TodoTemplate.js와 TodoTemplate.scss 파일을 생성하세요. 
+
+그다음에는 자바스크립트 파일을 다음과 같이 작성하세요.
+
+TodoTemplate.js
+
+import './TodoTemplate.scss';
+
+const TodoTemplate = ({ children }) => {
+  return (
+    <div className="TodoTemplate">
+      <div className="app-title">일정 관리</div>
+      <div className="content">{children}</div>
+    </div>
+  );
+};
+
+export default TodoTemplate;
+
+
+다음으로 이 컴포넌트를 App.js에서 불러와 렌더링하세요.
+
+App.js
+
+import TodoTemplate from './components/TodoTemplate';
+
+const App = () => {
+  return <TodoTemplate>Todo App을 만들자!</TodoTemplate>;
+};
+
+export default App;
+
+
+이 컴포넌트를 작성하는 과정에서 다음과 같이 상단에 
+import를 넣지 않고 바로 컴포넌트를 사용하려고 하면, 
+VSCode에디터에서 자동 완성 기능이 나타날 것입니다.
+
+
+위 상태에서
+Enter 를 누르면 자동으로 import가 되면서 컴포넌트 이름이 입력됩니다. 
+그러나 TodoTemplate.js 컴포넌트가 
+VScode에서 다른 탭으로 열려 있지 않으면 
+자동 완성이 작동하지 않습니다. 
+닫혀 있는 파일에도 자동 완성이 제대로 작동하려면 
+프로젝트 최상위 디렉터리에 
+jsconfig.json 파일을 만들어 주어야 합니다.
+
+jsconfig.json 파일을 만들고 해당 파일을 열어서
+Ctrl Space 를 눌러 보세요.
+
+
+위와 같은 자동 완성 박스가 나타나면 Enter를 눌러 보세요
+
+. 그러면 다음과 같은 코드가 자동 완성됩니다.
+
+jsconfig.json
+{
+"compilerOptions": {
+"target": "es6"
+}
+}
+
+Ctrl Space 는 VSCode 에디터의 자동 완성 단축키입니다. 
+
+컴포넌트 이름을 입력할 때도 이 키를 입력해서 VS Code 
+에디터의 자동 완성 인텔리센스를 열 수 있습니다. 
+jsconfig.json 파일을 저장하고 나면, 
+불러오려는 컴포넌트 파일이 열려 있지 않아도 
+자동 완성을 통해 컴포넌트를 불러와서 사 용할 수 있습니다.
+
+이 작업을 마치면 위와 같은 화면이 나타날 것입니다. 
+이제 스타일을 작성할 차례인데요. 
+CSS가 익숙하지 않다면, 
+
+가급적 브라우저를 한쪽 화면에 띄워 놓고 
+각 스타일 코드가 실제로 어떠한 변화를 주는지 확인하면서 
+작성해 보는 것을 추천합니다.
+
+TodoTemplate.scss
+
+.TodoTemplate {
+  width: 512px;
+  // width가 주어진 상태에서 좌우 중앙 정렬
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 6rem;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.app-title {
+  background: #2268cf;
+  color: white;
+  height: 4rem;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.content {
+  background: white;
+}
+
+다음과 같은 화면이 나타났나요?
+
+
+이 책에서는 레이아웃을 할 때 flex라는 display 
+속성을 자 주 쓸 텐데요. 
+
+코드에 있는 주석을 읽으며 작성해 보면 
+각 코드가 어떤 역할을 하는지 충분히 학습할 수 있지만, 
+flex를 더 자세히 알고 싶다면 
+Flexbox Froggy(http://flexboxfroggy.com/#ko)라는 
+사이트를 추천합니다. 
+
+flex를 학습하 는 데 큰 도움이 될 것입니다.
+m Flexbox Froggy - CSS flexbox X
+a https://flexboxfroggy.com/#ko
+FLEXBOX FROGGY
+
+단계 1 of 24
+Flexbox Froggy에 오신 것을 환영합니다!
+Flexbox Froggy는 Froggy와 전구를 입은 저는 게임입니다. 
+오는하의 JUStTy- content 속성을 용하여 
+개구리가 수련잎으로 이동할 수 있도록 도와주세요. 
+이 속 성은 다음의 값들을 인자로 받아 요소들을 가로선 상에서 정렬합니다:
+
+  flex-start: 요소들을 컨테이너의 왼쪽으로 정렬합니다.
+  flex-end : 요소들을 컨테이너의 오른쪽으로 정렬합니다.
+  center : 요소들을 컨테이너의 가운데로 정렬합니다.
+  space-between : 요소들 사이에 동일한 간격을 듭니다.
+  space-around: 요소들 주위에 동일한 간격을 듭니다.
+  
+예를 들어, Justify-content: flex-end; 는 
+개구리를 오른쪽 으로 이동시킵니다.
+
+#pond {
+display: flex; 
+justify-content: flex-end;|
+
+
+
+10.2.2 TodoInsert 만들기
+
+이번에는 TodoInsert를 만들 차례입니다. 
+
+components 디렉터리에 
+TodoInsert.js 파일과 TodoInsert.scss 파일을 생성하세요.
+
+TodoInsert.js
+
+import { MdAdd } from 'react-icons/md';
+import './TodoInsert.scss';
+
+const TodoInsert = () => {
+  return (
+    <form className="TodoInsert">
+      <input placeholder="할 일을 입력하세요" />
+      <button type="submit">
+        <MdAdd />
+      </button>
+    </form>
+  );
+};
+
+export default TodoInsert;
+
+
+여기서 처음으로 react-icons의 아이콘을 사용했습니다.
+
+https://react-icons.netlify.com/#/icons/md 
+페이지에 들어가면 다음과 같이 수많은 아이콘과 이름이 함께 나타나는데요.
+
+D react-icons
+https://react-icons.netlify.com/#/icons/md
+
+여기서 사용하고 싶은 아이콘을 고른 다음, 
+import 구문을 사용하여 불러온 후 컴포넌트처럼 사용하면 됩니다.
+
+import { 아이콘 이름 } from react-icons/md';
+
+이제 이 컴포넌트를 App에서 불러와 렌더링해 보세요.
+
+App.js
+
+import TodoTemplate from './components/TodoTemplate';
+import TodoInsert from './components/TodoInsert';
+
+const App = () => {
+  return (
+    <TodoTemplate>
+      <TodoInsert />
+    </TodoTemplate>
+  );
+};
+
+export default App;
+
+
+이제 이 컴포넌트를 스타일링해 봅시다!
+
+TodoInsert.scss
+
+.TodoInsert {
+  display: flex;  // 자식 요소들을 가로로 배치
+  background: #495057;
+
+  input {
+    // 기본 스타일 초기화
+    background: none; // 배경 제거
+    outline: none;    // 포커스 시 기본 outline 제거
+    border: none;     // 테두리 제거
+    padding: 0.5rem;  // 패딩 설정
+    font-size: 1.125rem;  // 폰트 크기 설정
+    line-height: 1.5; // 줄 높이 설정
+    color: white;    // 글자 색을 흰색으로 설정
+
+    &::placeholder {  // placeholder 텍스트 스타일
+      color: #dee2e6;  // placeholder 색상 설정
+    }
+
+    // 버튼을 제외한 영역을 모두 차지하기
+    flex: 1;  // input 요소가 남는 공간을 차지하도록 설정
+  }
+
+  button {
+    // 기본 스타일 초기화
+    background: none;   // 배경 제거
+    outline: none;      // 포커스 시 기본 outline 제거
+    border: none;       // 테두리 제거
+    background: #868e96; // 버튼 배경색 설정
+    color: white;       // 버튼 글자 색을 흰색으로 설정
+    padding-left: 1rem; // 왼쪽 패딩 설정
+    padding-right: 1rem; // 오른쪽 패딩 설정
+    font-size: 1.5rem;  // 폰트 크기 설정
+    display: flex;      // 자식 요소를 flex로 배치
+    align-items: center; // 수직 중앙 정렬
+    cursor: pointer;    // 커서를 포인터로 변경
+    transition: 0.1s background ease-in;  // 배경색 전환 효과 설정
+
+    &:hover {  // 버튼에 마우스를 올렸을 때 스타일
+      background: #adb5bd;  // hover 시 배경색 변경
+    }
+  }
+}
+
+
+
+스타일링을 하니 TodoInsert 컴포넌트가 훨씬 아름다워졌지요? 
+마우스를 + 버튼에 올려 보세요. 
+버튼의 배경색도 잘 바뀌나요?
+
+10.2.3 TodoListItem과 TodoList 만들기
+
+이제 일정 관리 항목이 보일 TodoListItem과 Todolist를
+만들 차례입니다.
+
+먼저 TodoListItem 컴포넌트부터 만들어 봅시다. 
+
+components 디렉터리에 TodoListItem.js와 
+TodoListItem.scss를 생성하세요.
+
+그다음에는 TodoListItem.js를 다음과 같이 작성해 보세요.
+
+TodoListItem.js
+
+import { MdCheckBoxOutlineBlank, MdCheckBox, MdRemoveCircleOutline } from 'react-icons/md';
+import './TodoListItem.scss';
+
+const TodoListItem = () => {
+  return (
+    <div className="TodoListItem">
+      <div className="checkbox">
+        <MdCheckBoxOutlineBlank />
+        <div className="text">할 일</div>
+      </div>
+      <div className="remove">
+        <MdRemoveCircleOutline />
+      </div>
+    </div>
+  );
+};
+
+export default TodoListItem;
+
+
+여기서는 다양한 아이콘을 불러와 사용했습니다. 아
+직 MdCheckBox 아이콘 컴포넌트는 사용하지 않은 상태인데요. 
+
+이 아이콘은 나중에 할 일이 완료되었을 때 
+체크된 상태를 보여 주기 위해 사용할 아이콘입니다.
+
+이 컴포넌트를 다 작성했으면 
+TodoList.js 파일과 TodoList.SCss 파일을 생성하고, 
+TodoListjs 컴포넌트를 다음과 같이 작성해 보세요.
+
+TodoList.js
+
+import TodoListItem from './TodoListItem';
+import './TodoList.scss';
+
+const TodoList = () => {
+  return (
+    <div className="TodoList">
+      <TodoListItem />
+      <TodoListItem />
+      <TodoListItem />
+    </div>
+  );
+};
+
+export default TodoList;
+
+
+지금은 이 컴포넌트에 TodoListItem을 불러와서 
+별도의 props 전달 없이 그대로 여러 번 보여 주고 있습니다. 
+
+나중에는 여기에 기능을 추가하고 다양한 데이터를 전달할 것입니다.
+컴포넌트를 다 작성했으면 App에서 렌더링해 주세요.
+
+App.js
+
+import TodoTemplate from './components/TodoTemplate';
+import TodoInsert from './components/TodoInsert';
+import TodoList from './components/TodoList';
+
+const App = () => {
+  return (
+    <TodoTemplate>
+      <TodoInsert />
+      <TodoList />
+    </TodoTemplate>
+  );
+};
+
+export default App;
+
+
+스타일링되지 않은 TodoList
+
+이제 여기에 스타일링을 합시다!
+
+스타일링할 첫 번째 컴포넌트는 
+TodoList인데, 필요한 스타일이 그다지 많지 않습니다.
+
+TodoList.scss
+
+.TodoList {
+  min-height: 320px; // 최소 높이 설정
+  max-height: 513px; // 최대 높이 설정
+  overflow-y: auto;  // 세로 스크롤 가능하도록 설정
+}
+
+
+그다음에는 TodoListItem을 스타일링하세요.
+
+TodoListItem.scss
+
+ .TodoListItem {
+  padding: 1rem;
+  display: flex;
+  align-items: center; // 세로 중앙 정렬
+
+  &:nth-child(even) {
+    background: #f8f9fa; // 짝수 번째 항목의 배경색 설정
+  }
+
+  .checkbox {
+    cursor: pointer; // 마우스 커서를 포인터로 변경
+    flex: 1; // 차지할 수 있는 영역 모두 차지
+    display: flex;
+    align-items: center; // 세로 중앙 정렬
+
+    svg {
+      font-size: 1.5rem; // 아이콘 크기 설정
+    }
+  }
+
+  .text {
+    margin-left: 0.5rem; // 왼쪽 여백 설정
+    flex: 1; // 차지할 수 있는 영역 모두 차지
+
+    // 체크되었을 때의 스타일
+    &.checked {
+      svg {
+        color: #2268cf; // 체크된 아이콘 색상
+      }
+
+      color: #adb5bd; // 체크된 텍스트 색상
+      text-decoration: line-through; // 텍스트에 취소선 추가
+    }
+  }
+
+  .remove {
+    display: flex;
+    align-items: center;
+    font-size: 1.5rem; // 아이콘 크기 설정
+    color: #ff6b6b; // 삭제 버튼 기본 색상
+    cursor: pointer; // 마우스 커서를 포인터로 변경
+
+    &:hover {
+      color: #ff8787; // 삭제 버튼에 마우스를 올렸을 때 색상
+    }
+  }
+
+  // 엘리먼트 사이사이에 테두리 추가
+  & + & {
+    border-top: 1px solid #dee2e6; // 위쪽 테두리 설정
+  }
+}
+
+
+저장하고 화면을 확인해 보세요.
+
+
+컴포넌트의 스타일링이 모두 끝났습니다!
+
+
+10.3 기능 구현하기
+
+이제 일정 관리 애플리케이션이 실제로 동작할 수 있도록 
+기능을 구현해 봅시다!
+
+10.3.1 App에서 todos 상태 사용하기 나중에 
+추가할 일정 항목에 대한 상태들은 
+모두 App 컴포넌 트에서 관리합니다. 
+
+APP에서 uSeState를 사용하여 
+todos라 는 상태를 정의하고, 
+todos를 TodoList의 props로 전달해 보세요.
+
+App.js
+
+import React, { useState } from 'react';
+import TodoTemplate from './components/TodoTemplate';
+import TodoInsert from './components/TodoInsert';
+import TodoList from './components/TodoList';
+
+const App = () => {
+  const [todos, setTodos] = useState([
+    {
+      id: 1,
+      text: '리액트의 기초 알아보기',
+      checked: true,
+    },
+    {
+      id: 2,
+      text: '컴포넌트 스타일링해 보기',
+      checked: true,
+    },
+    {
+      id: 3,
+      text: '일정 관리 앱 만들어 보기',
+      checked: false,
+    },
+  ]);
+
+  return (
+    <TodoTemplate>
+      <TodoInsert />
+      <TodoList todos={todos} />
+    </TodoTemplate>
+  );
+};
+
+export default App;
+
+
+todos 배열 안에 들어있는 객체에는 각 항목의 고유 id, 
+내용, 완료 여부를 알려 주는 값이 포함되어 있습니다. 
+이 배열은 TodoList에 props로 전달되는데요. 
+
+TodoList에서 이 값을 받아 온 후 Todoltem으로 변환하여 
+렌더링하도록 설정 해야 합니다.
+
+TodoList.js
+
+import TodoListItem from './TodoListItem';
+import './TodoList.scss';
+
+const TodoList = ({ todos }) => {
+  return (
+    <div className="TodoList">
+      {todos.map((todo) => (
+        <TodoListItem todo={todo} key={todo.id} />
+      ))}
+    </div>
+  );
+};
+
+export default TodoList;
+
+
+
+props로 받아온 todos 배열을 배열 내장 함수 map을 통해 
+TodoListItem 으로 이루어진 배열로 변환하여 
+렌더링 해주었습니다. 
+
+map을 사용하여 컴포넌트로 변환할 때는 key props 를 
+전달해 주어야 한다고 배웠지요? 
+
+여기서 사용되는 key 값은 각 항목마다 가지고 있는 
+고윳값인 id를 넣어 주세요. 
+
+그리고 todo 데이터는 통째로 props로 전달해 주세요. 
+
+여러 종류의 값을 전달해야 하는 경우에는 
+
+객체로 통째로 전달하는 편이 나중에 성능 최적화를 할 때 편리합니다.
+
+이제 TodolistItem 컴포넌트에서 받아온 
+todo 값에 따라 제대로 된 
+UI를 보여 줄 수 있도록 컴포넌트를 수정해 보세요. 
+
+이 코드에서는 조건부 스타일링을 위해 classnames를 사용합니다.
+
+TodoListItem.js
+
+import {
+  MdCheckBoxOutlineBlank,
+  MdCheckBox,
+  MdRemoveCircleOutline,
+} from 'react-icons/md';
+import cn from 'classnames';
+import './TodoListItem.scss';
+
+const TodoListItem = ({ todo }) => {
+  const { text, checked } = todo;
+
+  return (
+    <div className="TodoListItem">
+      <div className={cn('checkbox', { checked })}>
+        {checked ? <MdCheckBox /> : <MdCheckBoxOutlineBlank />}
+        <div className="text">{text}</div>
+      </div>
+      <div className="remove">
+        <MdRemoveCircleOutline />
+      </div>
+    </div>
+  );
+};
+
+export default TodoListItem;
+
+
+
+이제 TodoList 컴포넌트는 App에서 전달해 준 
+todos 값에 따라 다른 내용을 제대로 보여 줍니다.
+
+데이터 전달 완료
+
+
+10.3.2 항목 추가 기능 구현하기
+
+이번에는 일정 항목을 추가하는 기능을 구현해 보겠습니다.
+
+이 기능을 구현하려면, 
+TodoInsert 컴포넌트에서 인풋 상태 를 관리하고 
+
+App 컴포넌트에는 todos 배열에 새로운 객체를 
+추가하는 함수를 만들어 주어야 합니다.
+
+
+10.3.2.1 Todonsert value 상태 관리하기 
+
+TodoInsert 컴포넌트에서 인풋에 입력하는 값을 
+관리할 수 있도록 usestate를 사용하여 
+value라는 상태를 정의하겠습니다. 
+
+추가로 인풋에 넣어줄 onChange 함수도 
+작성 해주어야 하는데요, 
+이 과정에서 컴포넌트가 리렌더링될 때마다 
+함수를 새로 만드는 것이 아니라, 
+
+한 번 함수를 만들고 재사용 할 수 있도록 
+useCalLback Hook을 사용하겠습니다.
+
+
+TodoInsert.js
+
+import { useState, useCallback } from 'react';
+import { MdAdd } from 'react-icons/md';
+import './TodoInsert.scss';
+
+const TodoInsert = () => {
+  const [value, setValue] = useState('');
+
+  const onChange = useCallback((e) => {
+    setValue(e.target.value);
+  }, []);
+
+  return (
+    <form className="TodoInsert">
+      <input
+        placeholder="할 일을 입력하세요"
+        value={value}
+        onChange={onChange}
+      />
+      <button type="submit">
+        <MdAdd />
+      </button>
+    </form>
+  );
+};
+
+export default TodoInsert;
+
+
+
+이제 인풋에 텍스트를 입력해 보세요. 
+오류가 발생하지 않고 텍스트가 잘 입력되나요?
+
+사실 인풋은 value 값과 onChange를 설정하지 
+않더라도 입력할 수 있습니다. 
+
+그저 리액트 컴포넌트 쪽에서 해당 인풋에 무엇이 입력되어 있는지 
+추적하지 않을 뿐이죠. 
+
+이런 경우 현재 state가 잘 업데이트되고 있는지 확인하려면, 
+onChange 함수 안에서 console.log를 찍어 보는 것 
+외에 어떤 방법이 있을까요? 
+
+바로 리액트 개발자 도구(React Developer Tools)를 
+사용하는 방법이 있습니다.
+
+
+10.3.2.2 리액트 개발자 도구 
+
+
+리액트 개발자 도구는 브라우저에 나타난 리
+액트 컴포넌트를 심층 분석할 수 있도록 
+리액트 개발 팀이 만들었으며, 
+
+크롬 웹 스토어에서 React Developer Tools를 
+검색하여 설치할 수 있습니다. 크롬 웹 스토어 주소는 
+https://chrome.google.com/webstore/category/extensions;44.
+
+• React Developer Tools 
+- Chron xhttps://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadoplibjfkapdkoienihi
+chrome 웹 스토어
+
+크롬 웹 스토어 리액트 개발자 도구
+설치하고 나서 크롬 개발자 도구를 열면 개발자 도구 탭에 
+Components가 나타납니다. 이를 클릭하세요. 
+그리고 좌측에 서 TodoInsert를 선택하면, 
+다음과 같이 인풋을 수정했을 때 Hooks의 
+State 부분에도 똑같은 값이 잘 들어가는 것을 확인할 수 있습니다.
+
+
+10.3.2.3 todos 배열에 새 객체 추가하기 
+
+이번에는 ApP 컴포넌트에서 todos 배열에 
+새 객체를 추가 하는 onInsert 함수를 만들어 보겠습니다. 
+
+이 함수에서는 새로운 객체를 만들 때마다 id 값에 
+1씩 더해 주어야 하는데요.
+
+id 값은 useRef를 사용하여 관리하겠습니다. 
+여기서 usestate가 아닌 useRef를 사용하여 컴포넌트에서 
+사용할 변수를 만드는 이유는 무엇일까요? 
+
+id 값은 렌더링되는 정보가 아니기 때문입니다. 
+
+예를 들어 
+이 값은 화면에 보이지도 않고, 
+이 값이 바뀐다고 해서 컴포넌트가 리렌더링될 필요도 없습니다 . 
+
+단순히 새로운 항목을 만들 때 참조되는 값일 뿐입니다.
+또한, onInsert 함수는 컴포넌트의 성능을 아낄 수 있도록 
+useCallback으로 감싸 주겠습니다. 
+
+props로 전달해야 할 함 수를 만들 때는 
+useCalLback을 사용하여 함수를 감싸는 것 을 습관화하세요.
+
+onInsert 함수를 만든 뒤에는 해당 함수를 
+TodoInsert 컴 포넌트의 props로 설정해 주세요.
+
+
+App.js
+
+import { useState, useRef, useCallback } from 'react';
+import TodoTemplate from './components/TodoTemplate';
+import TodoInsert from './components/TodoInsert';
+import TodoList from './components/TodoList';
+
+const App = () => {
+  const [todos, setTodos] = useState([
+    {
+      id: 1,
+      text: '리액트의 기초 알아보기',
+      checked: true,
+    },
+    {
+      id: 2,
+      text: '컴포넌트 스타일링해 보기',
+      checked: true,
+    },
+    {
+      id: 3,
+      text: '일정 관리 앱 만들어 보기',
+      checked: false,
+    },
+  ]);
+
+  // 고유 id로 사용될 값
+  // ref를 사용하여 변수 담기
+  const nextId = useRef(4);
+
+  const onInsert = useCallback(
+    (text) => {
+      const todo = {
+        id: nextId.current,
+        text,
+        checked: false,
+      };
+      setTodos((todos) => todos.concat(todo)); // 새로운 항목 추가
+      nextId.current += 1; // nextId를 1씩 증가
+    },
+    []
+  );
+
+  return (
+    <TodoTemplate>
+      <TodoInsert onInsert={onInsert} />
+      <TodoList todos={todos} />
+    </TodoTemplate>
+  );
+};
+
+export default App;
+
+
+
+10.3.2.4 TodoInsert에서 onSubmit 이벤트 설정 하기
+
+지금부터는 버튼을 클릭하면 발생할 이벤트를 설정해 보겠습니다. 
+
+방금 App에서 TodoInsert에 넣어준 onInsert 함수에 
+현재 useState를 통해 관리하고 있는 
+value 값을 파라미터로 넣어서 호출합니다.
+
+TodoInsert.js
+
+
+import { useState, useCallback } from 'react';
+import { MdAdd } from 'react-icons/md';
+import './TodoInsert.scss';
+
+const TodoInsert = ({ onInsert }) => {
+  const [value, setValue] = useState('');
+
+  const onChange = useCallback((e) => {
+    setValue(e.target.value);
+  }, []);
+
+  const onSubmit = useCallback(
+    (e) => {
+      onInsert(value);
+      setValue(''); // value 값 초기화
+
+      // submit 이벤트는 브라우저에서 새로고침을 발생시킵니다.
+      // 이를 방지하기 위해 이 함수를 호출합니다.
+      e.preventDefault();
+    },
+    [onInsert, value]
+  );
+
+  return (
+    <form className="TodoInsert" onSubmit={onSubmit}>
+      <input
+        placeholder="할 일을 입력하세요"
+        value={value}
+        onChange={onChange}
+      />
+      <button type="submit">
+        <MdAdd />
+      </button>
+    </form>
+  );
+};
+
+export default TodoInsert;
+
+
+
+onSubmit이라는 함수를 만들고, 
+이를 form의 onSubmit으로 설정했습니다. 
+
+이 함수가 호출되면 props로 받아 온 onInsert 함수에 
+현재 value 값을 파라미터로 넣어서 호출하고, 
+
+현재 value 값을 초기화합니다.
+
+추가로 onSubmit 이벤트는 브라우저를 새로고침시킵니다.
+
+이때 e.preventDefault() 함수를 호출하면 
+새로고침을 방지할 수 있습니다.
+
+물론 다음과 같이 onSubmit 대신에 
+버튼의 onClick 이벤트로도 충분히 처리할 수 있습니다.
+
+import { useCallback, useState } from 'react';
+import { MdAdd } from 'react-icons/md';
+
+const TodoInsert = ({ onInsert }) => {
+  const [value, setValue] = useState('');
+
+  const onChange = useCallback((e) => {
+    setValue(e.target.value);
+  }, []);
+
+  const onClick = useCallback(() => {
+    onInsert(value);
+    setValue(''); // value 값 초기화
+  }, [onInsert, value]);
+
+  return (
+    <form className="TodoInsert" onSubmit={(e) => e.preventDefault()}>
+      <input
+        placeholder="할 일을 입력하세요"
+        value={value}
+        onChange={onChange}
+      />
+      <button type="button" onClick={onClick}>
+        <MdAdd />
+      </button>
+    </form>
+  );
+};
+
+export default TodoInsert;
+
+
+이렇게 클릭 이벤트만으로도 할 수 있는데 
+굳이 form과 onSbmit 이벤트를 사용한 이유는 무엇일까요? 
+
+onSubmit 이벤트 의 경우 인풋에서
+Enter를 눌렀을 때도 발생하기 때문입니다. 
+
+반면 버튼에서 onClick만 사용했다면, 
+인풋에서 onKeyPress 이벤트를 통해 Enter를 
+감지하는 로직을 따로 작성해야 하죠. 
+
+그렇기 때문에 이번에는 onClick이 아닌 onSubmit 으로 
+새 항목을 추가하도록 처리했습니다.
+
+코드를 모두 입력했다면 브라우저에서 
+직접 새 일정 항목을 한번 추가해 보세요.
+
+
+추가 기능 구현 완료
+
+일정 항목 추가 기능이 모두 구현되었습니다!
+
+
+10.3.3 지우기 기능 구현하기 
+
+이번에는 지우기 기능을 구현해 보겠습니다. 
+리액트 컴포넌트에서 배열의 불변성을 지키면서 
+배열 원소를 제거해야 할 경우, 
+
+배열 내장 함수인 fiLter를 사용하면 매우 간편합니다
+
+
+10.3.3.1 배열 내장 함수 filter 
+
+filter 함수는 기존의 배열은 그대로 둔 상태에서 
+
+특정 조건을 만족하는 원소들만 따로 추출하여 
+새로운 배열을 만들어 줍니다.
+
+다음 코드 예제를 한번 확인해 보세요.
+
+filter 사용 예제
+const array = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+const biggerThanFive = array.filter(number => number> 5);
+// 결과: [6, 7, 8, 9, 10]
+
+filter 함수에는 조건을 확인해 주는 함수를 
+파라미터로 넣어 주어야 합니다. 
+
+파라미터로 넣는 함수는 true 혹은 false 값을 반환해야 하며, 
+
+여기서 true를 반환하는 경우만 새로운 배열에 포함됩니다.
+
+
+10.3.3.2 todos 배열에서 id로 항목 지우기 
+
+방금 배운 filter 함수를 사용하여 
+onRemove 함수를 작성해 보겠습니다. 
+
+App 컴포넌트에 id를 파라미터로 받아와서 같은 id를 
+가진 항목을 todos 배열에서 지우는 함수입니다. 
+
+이 함수를 만들고 나서 TodoList의 props로 설정해 주세요.
+
+App.js
+
+import { useState, useRef, useCallback } from 'react';
+import TodoTemplate from './components/TodoTemplate';
+import TodoInsert from './components/TodoInsert';
+import TodoList from './components/TodoList';
+
+const App = () => {
+  const [todos, setTodos] = useState([
+    {
+      id: 1,
+      text: '리액트의 기초 알아보기',
+      checked: true,
+    },
+    {
+      id: 2,
+      text: '컴포넌트 스타일링해 보기',
+      checked: true,
+    },
+    {
+      id: 3,
+      text: '일정 관리 앱 만들어 보기',
+      checked: false,
+    },
+  ]);
+
+  const nextId = useRef(4);
+
+  const onInsert = useCallback(
+    (text) => {
+      const todo = {
+        id: nextId.current,
+        text,
+        checked: false,
+      };
+      setTodos((todos) => todos.concat(todo));
+      nextId.current += 1; // nextId를 1씩 증가
+    },
+    []
+  );
+
+  const onRemove = useCallback(
+    (id) => {
+      setTodos((todos) => todos.filter((todo) => todo.id !== id));
+    },
+    []
+  );
+
+  return (
+    <TodoTemplate>
+      <TodoInsert onInsert={onInsert} />
+      <TodoList todos={todos} onRemove={onRemove} />
+    </TodoTemplate>
+  );
+};
+
+export default App;
+
+
+
+
+10.3.3.3 TodoListItem에서 삭제 함수 호출하기 
+
+TodoListItem에서 방금 만든 onRemove 함수를 사용하려면 
+우선 TodoList 컴포넌트를 거쳐야 합니다. 
+
+다음과 같이 props로 받아 온 onRemove 함수를 
+TodoListItem에 그대로 전 달해 주세요.
+
+
+TodoList.js
+
+import TodoListItem from './TodoListItem';
+import './TodoList.scss';
+
+const TodoList = ({ todos, onRemove }) => {
+  return (
+    <div className="TodoList">
+      {todos.map((todo) => (
+        <TodoListItem todo={todo} key={todo.id} onRemove={onRemove} />
+      ))}
+    </div>
+  );
+};
+
+export default TodoList;
+
+
+
+이제 삭제 버튼을 누르면 
+TodoListItem에서 onRemove 함수에 현재 자신이 가진 id를 
+넣어서 삭제 함수를 호출하도록 설정해 보세요.
+
+
+TodoListItem.js
+
+import {
+  MdCheckBoxOutlineBlank,
+  MdCheckBox,
+  MdRemoveCircleOutline,
+} from 'react-icons/md';
+import cn from 'classnames';
+import './TodoListItem.scss';
+
+const TodoListItem = ({ todo, onRemove }) => {
+  const { id, text, checked } = todo;
+
+  return (
+    <div className="TodoListItem">
+      <div className={cn('checkbox', { checked })}>
+        {checked ? <MdCheckBox /> : <MdCheckBoxOutlineBlank />}
+      </div>
+      <div className="text">{text}</div>
+      <div className="remove" onClick={() => onRemove(id)}>
+        <MdRemoveCircleOutline />
+      </div>
+    </div>
+  );
+};
+
+export default TodoListItem;
+
+
+
+다 작성했으면, 
+브라우저를 열어 일정 항목의 우측에 나타나는 
+빨간색 아이콘 버튼을 눌러 보세요. 
+항목이 제대로 삭제되 었나요?
+
+
+10.3.4 수정 기능
+
+수정 기능도 방금 만든 삭제 기능과 꽤 비슷합니다. 
+onToggLe이라는 함수를 App에 만들고, 
+해당 함수를 TodoList 컴포 넌트에게 props로 넣어 주세요. 
+그다음에는 TodoList를 통해 TodoListItem까지 전달해 주면 됩니다.
+
+
+10.3.4.1 onToggle 구현하기
+
+
+App.js
+
+
+import { useState, useRef, useCallback } from 'react';
+
+import TodoTemplate from './components/TodoTemplate';
+import TodoInsert from './components/TodoInsert';
+import TodoList from './components/TodoList';
+
+const App = () => {
+  const [todos, setTodos] = useState([
+    {
+      id: 1,
+      text: '리액트의 기초 알아보기',
+      checked: true,
+    },
+    {
+      id: 2,
+      text: '컴포넌트 스타일링해 보기',
+      checked: true,
+    },
+    {
+      id: 3,
+      text: '일정 관리 앱 만들어 보기',
+      checked: false,
+    },
+  ]);
+
+  const nextId = useRef(4);
+
+  const onInsert = useCallback((text) => {
+    const todo = {
+      id: nextId.current,
+      text,
+      checked: false,
+    };
+    setTodos((todos) => todos.concat(todo));
+    nextId.current += 1; // nextId를 1씩 증가
+  }, []);
+
+  const onRemove = useCallback((id) => {
+    setTodos((todos) => todos.filter((todo) => todo.id !== id));
+  }, []);
+
+  const onToggle = useCallback((id) => {
+    setTodos((todos) =>
+      todos.map((todo) =>
+        todo.id === id ? { ...todo, checked: !todo.checked } : todo
+      )
+    );
+  }, []);
+
+  return (
+    <TodoTemplate>
+      <TodoInsert onInsert={onInsert} />
+      <TodoList todos={todos} onRemove={onRemove} onToggle={onToggle} />
+    </TodoTemplate>
+  );
+};
+
+export default App;
+
+
+
+위 코드에서는 배열 내장 함수 map을 사용하여 
+특정 id를 가 지고 있는 객체의 
+Checked 값을 반전시켜 주었습니다. 
+
+불변성을 유지하면서 특정 배열 원소를 업데이트해야 할 때 
+이렇게 map을 사용하면 짧은 코드로 쉽게 작성할 수 있습니다.
+
+자, 여기서 갑자기 왜 map이 사용된 것인지 이해하기 
+힘들 수 도 있습니다. 
+
+map 함수는 배열을 전체적으로 새로운 형태로 변환하여 
+새로운 배열을 생성해야 할 때 사용한다고 배웠습 니다. 
+
+지금은 딱 하나의 원소만 수정하는데 왜 map을 사용할 까요?
+
+onToggle 함수를 보면 
+todo.id === id ? ... : ...이라는 삼항 연산자가 사용되었습니다. 
+
+여기서 사용한 코드에 대해 좀 더 자세히 알아봅시다. 
+
+todo.id와 현재 파라미터로 사용된 id 값이 같을 때는 
+우리가 정해 준 규칙대로 새로운 객체를 생성하지만, 
+
+id 값이 다를 때는 변화를 주지 않고 
+처음 받아 왔던 상태 그대로 반환합니다. 
+
+그렇기 때문에 map을 사용하여 만든 배열에서 
+변화가 필요한 원소만 업데이트되고 
+나머지는 그대로 남아 있게 되는 것입니다.
+
+
+10.3.4.2 TodoListItem에서 토글 함수 호출하기 
+
+이제 App에서 만든 onToggLe 함수를 TodoListItem에서도 
+호출할 수 있도록 TodoList를 거쳐 
+TodoListItem에게 전달 하겠습니다.
+
+
+TodoList.js
+
+import TodoListItem from './TodoListItem';
+import './TodoList.scss';
+
+const TodoList = ({ todos, onRemove, onToggle }) => {
+  return (
+    <div className="TodoList">
+      {todos.map((todo) => (
+        <TodoListItem
+          todo={todo}
+          key={todo.id}
+          onRemove={onRemove}
+          onToggle={onToggle}
+        />
+      ))}
+    </div>
+  );
+};
+
+export default TodoList;
+
+
+
+
+이어서 TodoListItem도 수정해 보세요. 
+이전에 onRemove를 사용했던 것과 비슷하게 구현하면 됩니다
+
+
+TodoListItem.js
+
+import {
+  MdCheckBoxOutlineBlank,
+  MdCheckBox,
+  MdRemoveCircleOutline,
+} from 'react-icons/md';
+import cn from 'classnames';
+import './TodoListItem.scss';
+
+const TodoListItem = ({ todo, onRemove, onToggle }) => {
+  const { id, text, checked } = todo;
+
+  return (
+    <div className="TodoListItem">
+      <div
+        className={cn('checkbox', { checked })}
+        onClick={() => onToggle(id)}
+      >
+        {checked ? <MdCheckBox /> : <MdCheckBoxOutlineBlank />}
+        <div className={cn('text', { checked })}>{text}</div>
+      </div>
+      <div className="remove" onClick={() => onRemove(id)}>
+        <MdRemoveCircleOutline />
+      </div>
+    </div>
+  );
+};
+
+export default TodoListItem;
+
+
+
+이제 마지막 기능까지 모두 구현되었습니다! 
+체크 박스를 눌 러 보세요. 상태가 잘 업데이트되나요?
+
+토글 기능 구현 완료
+
+10.4 정리
+축하합니다! 첫 프로젝트를 완성했습니다. 
+이번에 만든 프로 젝트는 소규모이기 때문에 
+따로 컴포넌트 리렌더링 최적화 작업을 하지 않아도 정상적으로 작동합니다. 
+하지만 일정 항 목이 몇 만 개씩 생긴다면 
+새로운 항목을 추가하거나 기존 항 목을 삭제 및 
+토글할 때 지연이 발생할 수 있습니다. 
+
+클라이언트 자원을 더욱 효율적으로 사용하려면 
+불필요한 리렌더링을 방지해야 하는데요, 
+이에 관한 내용은 이어지는 11장에서 다루어 보겠습니다.
