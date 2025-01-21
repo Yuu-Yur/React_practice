@@ -755,7 +755,8 @@ $ yarn add open-color include-media
 utils.scss
 변경
 //@import '~include-media/dist/include-media';
- 
+@import '~include-media/dist/_include-media';
+@import '~open-color/open-color';
 (...)
 =======================================================
 vite 에서는 기본적으로 ~ 물결 문자 없이도 경로를 자동으로 찾음.

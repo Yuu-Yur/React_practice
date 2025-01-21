@@ -277,3 +277,41 @@ css`
   @media (max-width: 768/16em) {
     background: white
   }`
+
+
+10. Todo 애플리케이션 만들어보기
+실습과 같음, 객체에 대해 map, reduce, concat, filter 등을 잘 쓰고
+useState, useRef 등, props 를 전달하고 받아서 사용
+
+11. 10장에서 만든 프로그램의 최적화, todo 수를 몇천개로 늘리면 오래걸림
+최적화 1. React.memo : export default에서 내보내는 곳을 React.memo(이름) 으로 하면 props에 변화가 생겨야 리렌더링
+최적화 2. setter 에 직접 상태 쓰지 않기, () => {} 로 함수형으로 처리해서 state 가 변할때 마다 새로 setter 를 만드는게 아닌 state 의 변화와 상관없는 함수형으로 만듬
+최적화 3. react-virtualized : 보여주는 컴포넌트를 가상화해서 특정 픽셀에 들어갈 만큼의 row 만 rendering 함
+rowRenderer 을 콜백으로 사용
+index, key, style 을 parameter 로 받아서
+todos[index]; 을 할당하고 todo로
+return (
+        <TodoListItem
+          todo={todo}
+          key={key}
+          onRemove={onRemove}
+          onToggle={onToggle}
+          style={style}
+        />
+        );
+
+그리고 밑에서 return (
+  <List 
+        className="TodoList"
+      width={512} // 전체 너비
+      height={513} // 전체 높이
+      rowCount={todos.length} // 항목 개수
+      rowHeight={57} // 각 항목의 높이
+      rowRenderer={rowRenderer} // 항목을 렌더링하는 함수
+      list={todos} // 렌더링할 데이터 배열
+      style={{ outline: 'none' }} // 기본 outline 스타일 제거
+      />
+)
+
+마지막으로 rowRenderer style props 로 주는것을 TodoListItem 에서 받아야 한다.
+최상위 div 에 className={기존이름-virtualized} style={style} 설정

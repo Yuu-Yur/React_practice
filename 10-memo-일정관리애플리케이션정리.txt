@@ -316,11 +316,11 @@ export default TodoInsert;
 
 여기서 처음으로 react-icons의 아이콘을 사용했습니다.
 
-https://react-icons.netlify.com/#/icons/md 
+https://react-icons.github.io/react-icons/search/#q=MD
 페이지에 들어가면 다음과 같이 수많은 아이콘과 이름이 함께 나타나는데요.
 
 D react-icons
-https://react-icons.netlify.com/#/icons/md
+https://react-icons.github.io/react-icons/search/#q=MD
 
 여기서 사용하고 싶은 아이콘을 고른 다음, 
 import 구문을 사용하여 불러온 후 컴포넌트처럼 사용하면 됩니다.

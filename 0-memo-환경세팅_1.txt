@@ -99,7 +99,7 @@ yarn start
 
 방법4으로 작업을 할 예정. vite, 작업. 
 폴더명 : hello-vite-test, 예시. 
-yarn create vite ch5-vite-test --template react 
+yarn create vite ch10-vite-test --template react 
 폴더 이동후, 
 yarn 
 yarn dev 
