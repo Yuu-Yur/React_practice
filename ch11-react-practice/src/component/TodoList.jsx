@@ -1,6 +1,6 @@
 import TodoListItem from './TodoListItem';
 import './TodoList.scss';
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { List } from 'react-virtualized';
 
 const TodoList = ({ todos, onRemove, onToggle, onClick, removeAll }) => {
@@ -9,16 +9,16 @@ const TodoList = ({ todos, onRemove, onToggle, onClick, removeAll }) => {
     if (todo.checked) acc += 1;
     return acc;
   }, 0);
-  const checkedNum2 = todos.filter((todo) => todo.checked === true).length;
+  // const checkedNum2 = todos.filter((todo) => todo.checked === true).length;
   // 예제 3: 필터링된 할 일 목록 표시 (체크/미체크), useState
   const [checked, setChecked] = useState(false);
 
-  // 실습 2: 할 일 검색 기능 구현, 검색값을 state 에 set, 배열을 filter
+  // 실습 2: 할 일 검색 기능 구현, 검색값을 state 에 set, 배열을 filter 영문 고려하면 전부 소문자로 변환 필요 있음
   const [value, setValue] = useState('');
-  const onChange = (e) => setValue(e.target.value);
   const filteredTodos = todos.filter(
     (todo) =>
-      (checked ? todo.checked : !todo.checked) && todo.text.includes(value),
+      (checked ? todo.checked : !todo.checked) &&
+      todo.text.toLocaleLowerCase().includes(value.toLocaleLowerCase()),
   );
 
   const rowRenderer = useCallback(
@@ -64,7 +64,7 @@ const TodoList = ({ todos, onRemove, onToggle, onClick, removeAll }) => {
       />
       <input
         type="text"
-        onChange={onChange}
+        onChange={(e) => setValue(e.target.value)}
         placeholder="검색어를 입력해주세요"
       />
     </>

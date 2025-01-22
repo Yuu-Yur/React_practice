@@ -58,7 +58,7 @@ function App() {
 
   return (
     <>
-      <h1>CH10. 일정 관리 애플리케이션</h1>
+      <h1>CH11. 최적화</h1>
       <TodoTemplate>
         <TodoInsert onInsert={onInsert} />
         <TodoList
