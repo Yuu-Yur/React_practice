@@ -40,3 +40,27 @@
 .read-the-docs {
   color: #888;
 }
+
+.checkbox {
+  cursor: pointer; 
+  flex: 1; 
+  display: flex;
+  align-items: center; 
+
+  svg {
+      font-size: 1.5rem; 
+  }
+}
+
+.checked {
+  svg {
+     color: #2268cf; 
+ }
+
+ color: #adb5bd; 
+ text-decoration: line-through; 
+}
+.text {
+ margin-left: 0.5rem; 
+ flex: 1; 
+}

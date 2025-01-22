@@ -328,8 +328,46 @@ return (
 최상위 div 에 className={기존이름-virtualized} style={style} 설정
 
 
+12. 불변성 유지
+앞에서 {...객체,요소: ~} 은 객체를 복사하고 지정 요소를 덮어쓰기
+[...객체, 요소:~] 은 객체를 복사하고 지정 요소를 추가하기로 배웠다.
+...는 스프레드 전개 연산자로 객체를 복사하는 연산자인데 문제점은 제일 윗단만 얕은 복사를 하는 점이다.
+깊은 객체를 스프레드 연산자로 제일 윗단만 복사하여 사용하면 문제점이 생기고
+깊게 있는 요소를 수정하려면
+let nextObject = {
+  ...object,
+  somewhere: {
+    ...object.somewhere,
+    deep: {
+      ...object.somewhere.deep,
+      inside: 4,
+    },
+  },
+위처럼 코드가 쓸데없이 길어진다. 이것때문에 immer 를 사용한다.
+
+import { produce } from 'immer'; 로 import
+const nextState = produce(originalState, (draft) => {
+  draft.somewhere.deep.inside = 5;
+});
+단 요소 key 에 접근할 때 동적으로 접근하고싶다면 .key 를 [parameter] 로 써야한다.
+produce() 는 두가지 parameter 받음, 변경할 state , setter
+즉 produce(state,setter) 은 형태
+대신 setter 가 자동으로 parameter 로 state 를 복사한 것을 받으므로
+parameter 를 가지는 함수로 써야한다.
+이러면 스프레드 연산자를 쓴 긴 코드가 아니라 직관적으로 접근하는 코드를 쓸 수 있다.
+또한 이 setter 의 함수 안에선 parameter 는 배열이므로 내장 함수도 쓸 수 있다. (splice, findIndex, map, filter 등등)
+useCallback 와 immer 조합
+produce(setter) 만 쓰면 setter 를 반환함 대신 안에서 요소key 를 썼으므로 그런 key 가 있는 state 에만 쓸 수 있음
+결론
+produce(state, setter) 은 변환된 state(복제) 를 반환하고
+produce(setter) 은 setter 함수 자체를 반환함
+
+splice 복습
+splice 는 배열 자체를 직접 변경하므로 react 에선 복사본에만 써야함
+배열.splice(변경시작할인덱스,제거갯수,옵션(삽입할 요소1,요소2,...,요소n))
+
 배운 외부 라이브러리
-sass
+sass : css 코드 깔끔하게 쓸 수 있게, css 코드에서도 변수와 mixin include을 사용한 함수형태를 사용할 수 있게
 open-color
 include-media
 classnames
