@@ -366,6 +366,78 @@ splice 복습
 splice 는 배열 자체를 직접 변경하므로 react 에선 복사본에만 써야함
 배열.splice(변경시작할인덱스,제거갯수,옵션(삽입할 요소1,요소2,...,요소n))
 
+
+13.리액트 라우팅
+리액트는 기본적으로 html 하나만 사용
+spa : single page application
+a tag 로 화면을 넘기면 state 가 전부 깨져버리기에 사용하지 않음
+브라우저의 History API를 사용하여 브라우저의 주소창의 값만 변경하고 다른 컴포넌트를 보여줌
+index 에서 import 설정 후
+BrowserRouter : 최상위에서 쓸 곳을 감쌈
+Routes, Route : 라우팅 컴포넌트에서 사용
+Route : <Route path="주소규칙" element={보여 줄 컴포넌트<>} />
+주소규칙은 / 뒤에 라우팅 주소씀
+Link : 리액트 프로젝트 에서의 a 태그를 담당, a 태그와 작동방식이 전혀 다르다는것
+<Link to="주소규칙">~~~</Link> 으로 컴포넌트 불러옴
+
+URL 파라미터
+useParams hook import 필요 라우터 라이브러리에서
+useParams : 루트에서 지정한 path 의 :key 를 객체로 반환함 { 키: 값(해당 위치에 입력받은 값) }
+path
+/profiles/:username
+실제 입력받은 값
+/profiles/gildong
+여기서 useParams 는 {username: gildong} 을 반환함
+만약 여러 key 를 쓰고싶으면 이어 쓰면 됨
+ex) /profiles/:username/:a/:b/:c
+
+쿼리스트링
+useLocation hook import 필요 라우터 라이브러리에서
+useLocation() 는 객체를 반환하는데
+{search:,pathname,hash,state,key} 의 형태다
+pathname 은 현재 경로(주소규칙), search 은 ? 를 포함한 쿼리스트링 전체, hash 구형 브라우저에서 History API 가 지원되지 않을 때,
+state 는 이동 시 넣을 수 있는 state값, key 는 이 객체의 고유값 페이지가 변경될때마다 고유값 생성
+여기서 search 에서 쿼리스트링을 구분해내려면 ? 을 빼고, &와 로 스플릿하고 또 = 로 나눠서 key,value 를 구해야하는데 너무 귀찮음
+react v6부터 쿼리스트링을 파싱할 수 있는 hook 생김
+useSearchParams : searchParams, setter 반환
+즉 [searchParams,setSearchparams] = useSearchParams();
+이 searchParams 에서 get(key) 로 value 를 반환받을 수 있음
+ex) const detail = searchParams.get('detail');
+단 무조건 문자열로 반환되는것은 주의 형변환이 필요함
+
+중첩 라우팅
+레이아웃 표현할 때 유효
+중첩 라우팅 설정
+1. Route 를 부모-자식 컴포넌트 관계로 만듬
+2. Outlet 사용 import from 'react-router-dom'
+부모 컴포넌트에서 자식 컴포넌트를 보여줄 자리에 <Outlet />
+부모-자식 컴포넌트를 만들 때 부모의 path 를 설정하지 않으면
+자식의 주소를 쓰는데 부모의 컴포넌트에서 자식 컴포넌트를 Outlet 으로 불러올 수 있음
+
+Route 컴포넌트에는 기본적으로 index 가 props 로 내장되어있다.
+이것은 path="/" 와 같음
+
+useNavigate : 함수로 다른 페이지 이동
+const navigate = useNavigate();
+navigate(-1); 이전페이지
+navigate('주소') : 주소로 이동
+두번째 parameter 를 {replace:true} 로 사용하면 히스토리에 기록을 추가하지 않음 -> 뒤로가기 해도 정보가 없음
+여기서 navigate 는 당연히 함수이므로 이벤트 리스너에 붙일 수 있다.
+결국 Link 는 a태그 처럼 링크고 navigate 는 함수이다.
+
+NavLink : 링크가 현재 라우트의 경로와 일치하는 경우 스타일을 적용시킬 수 있음
+
+마지막에 Route path="*" element={<NotFound />}
+즉 지정되지 않은 주소로 접근하면 NotFound 띄워준다는것
+
+Navigate 컴포넌트
+리다이렉트 해주는 컴포넌트
+useNavigate 와 비슷함
+다른점은 Navigate 는 컴포넌트고 useNavigate 는 함수를 반환해주는 것이다.
+to= 로 간다.
+
+
+
 배운 외부 라이브러리
 sass : css 코드 깔끔하게 쓸 수 있게, css 코드에서도 변수와 mixin include을 사용한 함수형태를 사용할 수 있게
 open-color
@@ -375,3 +447,7 @@ styled-components
 react-icons
 react-virtualized
 immer
+react-router-dom
+
+언급한 프레임워크
+Next.js 리액트 프로젝트의 프레임워크
