@@ -31,6 +31,7 @@ URL에 파라미터를 추가하여 /category/:name
 중첩된 라우트를 설정하여
 /category/:name/details를 처리하려면 어떻게 해야 하나요?, 중첩 추가 */}
           <Route path="/category" element={<Categories />}>
+            <Route index element={<Home />} />
             <Route path=":name" element={<Category />}>
               <Route path="details" element={<CategoryDetails />} />
             </Route>

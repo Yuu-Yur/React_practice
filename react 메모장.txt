@@ -437,6 +437,65 @@ useNavigate 와 비슷함
 to= 로 간다.
 
 
+14. api 사용
+axios 라이브러리 사용
+비동기 await axios.get(api 주소) 로 응답을 받음, await 을 써야하니 그 함수에도 async 설정
+단 useEffect 를 쓸텐데 useEffect는 promise 를 반환하고 await 은 promice 를 반환하니 useEffect 에 직접 async 를 걸면 안되고
+안의 콜백함수에 async 를 써야한다. ex) async () => {}
+response 에 할당하고 response.data 로 데이터 객체를 꺼냄
+이것을 정보를 그릴 컴포넌트에 props 로 전달
+
+1. useState 사용
+useState 로 api 의 requestParams 를 관리하고 queryString 으로 정보를 받음
+const query = category === 'all' ? '' : `&category=${category}`;
+이런 식으로 쿼리 스트링을 동적으로 선택할 수 있음(category 를 정하고 받으면 됨)
+state 를 설정하고 변경하므로 업데이트가 지속적으로 발생함
+부모 컴포넌트까지 업데이트가 미치지 않게 부모 컴포넌트는 관련 컴포넌트끼리 묶어서 최적화 해야한다.
+ex) 부모 컴포넌트에 지금 Category 와 NewsList 가 있는데 이대로 쓰면 이 부모 컴포넌트가 계속 업데이트되어 다른 컴포넌트들도 다시 불러옴
+그렇기에 이 두개를 묶으면 이 두개가 업데이트되어도 부모 컴포넌트엔 영향이 없어 다른 컴포넌트들을 다시 불러오지않음
+
+2. 라우터 사용
+애시당초 state 를 좀 덜쓰면? -> 라우팅을 사용해서 url parameter 를 받아 props 로 사용
+즉 가능한 state 를 줄이면 업데이트를 줄일 수 있고 최적화에 도움이 된다.
+
+3. customHooks 사용
+함수와 의존성배열을 받아 성공,로딩,실패 를 반환하는 함수를 만들어놓고 이것을 import 해와서 사용
+성공 = parameter 로 받는 함수라고 쓰면 됨
+
+http://apis.data.go.kr/1360000/RoadWthrInfoService/getCctvStnRoadWthr?ServiceKey=zytXafKy%2Bm%2FrnUWmID8dWjMYtcsoEGBLO42CK%2BGCj7GqtS2rAskQyRttpfZ2dvx8SxomL8i90ZMPjBEJM2Plig%3D%3D&pageNo=1&nomOfRows=4&eqmtId=0500C00001&dataType=JSON
+이것을 axios 로 get 하면
+{
+  "response": {
+    "header": {
+      "resultCode": "00",
+      "resultMsg": "NORMAL_SERVICE"
+    },
+    "body": {
+      "dataType": "JSON",
+      "items": {
+        "item": [
+          {
+            "baseDate": "20250123",
+            "baseTime": "1510",
+            "weatherNm": "현상없음"
+          }
+        ]
+      },
+      "pageNo": 1,
+      "numOfRows": 10,
+      "totalCount": 1
+    }
+  }
+}
+이런 response 가 돌아온다.
+.data.response.body.items.item 이 우리가 원하는 데이터
+
+http://apis.data.go.kr/6260000/AttractionService/getAttractionKr?ServiceKey=zytXafKy%2Bm%2FrnUWmID8dWjMYtcsoEGBLO42CK%2BGCj7GqtS2rAskQyRttpfZ2dvx8SxomL8i90ZMPjBEJM2Plig%3D%3D&pageNo=1&numOfRows=5&resultType=json
+
+
+
+
+
 
 배운 외부 라이브러리
 sass : css 코드 깔끔하게 쓸 수 있게, css 코드에서도 변수와 mixin include을 사용한 함수형태를 사용할 수 있게
@@ -448,6 +507,10 @@ react-icons
 react-virtualized
 immer
 react-router-dom
+axios
 
 언급한 프레임워크
 Next.js 리액트 프로젝트의 프레임워크
+
+
+
