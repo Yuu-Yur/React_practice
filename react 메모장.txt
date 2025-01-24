@@ -490,7 +490,24 @@ http://apis.data.go.kr/1360000/RoadWthrInfoService/getCctvStnRoadWthr?ServiceKey
 이런 response 가 돌아온다.
 .data.response.body.items.item 이 우리가 원하는 데이터
 
-http://apis.data.go.kr/6260000/AttractionService/getAttractionKr?ServiceKey=zytXafKy%2Bm%2FrnUWmID8dWjMYtcsoEGBLO42CK%2BGCj7GqtS2rAskQyRttpfZ2dvx8SxomL8i90ZMPjBEJM2Plig%3D%3D&pageNo=1&numOfRows=5&resultType=json
+
+15장. context api
+context 라 함은 전역 설정과 같음
+createContext({color:'black'}) 를 사용하여 context 작성
+전역 설정을 사용할 땐
+<ColorContext.Consumer> 태그로 덮어야 함
+그리고 안에서 parameter 를 가지는 함수 작성
+parameter 은 createContext({color:'black}) 의 객체
+
+전역 설정을 만들어 놓은건 좋은데 이것을 변경 할 수 없다면 계속 전역 설정을 추가해야하는 불편함
+<ColorContext.Provider value={{ color: 'red' }}>
+setter 라고 보면 됨
+
+createContext() 에 객체를 좀 깊은 객체를 만들어놓고
+getter Consumer , setter Provider 을 선언하고 export 하면
+ColorConsumer, ColorProvider 사용 가능
+이 아래서 value 를 parameter 을 사용해도 되지만 깊은 객체의 경우 구조파괴할당으로 사용할 수 있음
+useContext 를 사용해서 밖으로 빼낼 수도 있음
 
 
 
